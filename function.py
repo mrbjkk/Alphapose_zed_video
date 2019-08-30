@@ -2,7 +2,6 @@ import configparser
 import numpy as np
 import cv2
 import threading
-import pyzed.sl as sl
 
 cf = configparser.ConfigParser()
 cf.read("SN23076.conf")
@@ -62,29 +61,23 @@ def frame_undistort(camMtx1, camMtx2, distCoef1, distCoef2, frame):
     return rec_img
 
 
-def get_distance(video_mode, camMtx1, x1, y1, x2):
+def get_distance(video_mode, camMtx1, u1, v1, u2, co_format):
     fx1 = camMtx1[0][0]
     # fx_r = mtx_r[0][0]
     (w, h) = get_resolution(video_mode)
-    if x1 <= x2:
-        x2 = x2 - (w/2)
-    else:
-        t = x1
-        x1 = x2
-        x2 = t - (w/2)
-
-    doffs = x1 - x2
+    u = sorted([u1, u2])
+    u[1] = u[1] - (w / 2)
+    doffs = u[0] - u[1]
     baseline = get_baseline()
 
     z = fx1 * baseline / doffs
-    # x = x1 * z / doffs
-    # y = y1 * z / doffs
+    x = u[0] * z / doffs
+    y = v1 * z / doffs
 
-    # z_right = baseline * fx_r / doffs
-    # x2 = z_right * u_right / doffs
-    # y2 = z_right * v_right / doffs
-
-    return x1, y1, z
+    if co_format is 'uv':
+        return u[0], v1, z
+    if co_format is 'xy':
+        return x, y, z
 
 
 def get_resolution(opt):
@@ -100,39 +93,30 @@ def set_camera(capture):
     capture.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
 
-class zed_videocapture:
-    def __init__(self):
-        self.frame = []
-        self.image = sl.Mat()
-        self.status = False
-        self.isStop = False
+def people_3d_coord(ppl, ppl_num, video_mode, camera_matrix):
+    coordinates_u = []
+    coordinates_v = []
+    dists = []
+    keypoint_order = {'Nose': 0,
+                      'LShoulder': 5, 'RShoulder': 6,
+                      'LWrist': 9, 'RWrist': 10,
+                      # 'LHip': 11, 'RHip': 12,
+                      'LAnkle': 15, 'RAnkle': 16}
+    if ppl_num is 2:
+        for i in range(ppl_num):
+            kpt_num1 = ppl[i]['keypoints'].numpy().shape[0]
+            kpt_num2 = ppl[i + 1]['keypoints'].numpy().shape[0]
+            if kpt_num1 == kpt_num2:
+                for j in keypoint_order.values():
+                    x1 = ppl[i]['keypoints'].numpy()[j][0]
+                    y1 = ppl[i]['keypoints'].numpy()[j][1]
+                    x2 = ppl[i + 1]['keypoints'].numpy()[j][0]
+                    # y2 = result['result'][i+1]['keypoints'].numpy()[j][1]
+                    u, v, z = get_distance(video_mode, camera_matrix, x1, y1, x2, 'uv')
+                    coordinates_u.append(u)
+                    coordinates_v.append(v)
+                    dists.append(z)
+            if i + 2 >= ppl_num:
+                break
 
-        # Connect webcam
-        self.zed = sl.Camera()
-        self.init_params = sl.InitParameters()
-        self.init_params.camera_resolution = sl.RESOLUTION.RESOLUTION_VGA
-        self.init_params.camera_fps = 30
-        self.err = self.zed.open(self.init_params)
-
-    def start(self):
-        # Deamon = True: threading is close along with main
-        t = threading.Thread(target=self.get_frame, args=())
-        t.daemon = True
-        t.start()
-        print('Camera started')
-
-    def get_frame(self):
-        if self.err is not sl.ERROR_CODE.SUCCESS:
-            self.zed.close()
-        if self.zed.grab(sl.RuntimeParameters()) is sl.ERROR_CODE.SUCCESS:
-            self.zed.retrieve_image(self.image, sl.VIEW.VIEW_SIDE_BY_SIDE, sl.MEM.MEM_CPU)
-            self.frame = self.image.get_data()
-            self.status = True
-        return self.status, self.frame
-
-    def get_fps(self):
-        return self.zed.get_camera_fps()
-
-    def get_frameSize(self):
-        return self.zed.get_resolution()
-
+    return coordinates_u, coordinates_v, dists

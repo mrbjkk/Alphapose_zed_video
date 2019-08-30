@@ -460,6 +460,7 @@ class DataWriter:
         self.video_mode = 'CAM_HD'
         self.camMtx1, self.distCoef1 = fl.get_matrix("LEFT_" + self.video_mode)
         self.camMtx2, self.distCoef2 = fl.get_matrix("RIGHT_" + self.video_mode)
+        self.res = fl.get_resolution(self.video_mode)
 
     def start(self):
         # start a thread to read frames from the file video stream
@@ -506,29 +507,9 @@ class DataWriter:
                         'imgname': im_name,
                         'result': result
                     }
-                    ppl_num = len(result['result'])
-                    coordinates_u = []
-                    coordinates_v = []
-                    dists = []
-                    head_order = {'Nose': 0,
-                                  'LShoulder': 5, 'RShoulder': 6,
-                                  'LWrist': 9, 'RWrist': 10}
-                    if ppl_num is 2:
-                        for i in range(ppl_num):
-                            kpt_num1 = result['result'][i]['keypoints'].numpy().shape[0]
-                            kpt_num2 = result['result'][i + 1]['keypoints'].numpy().shape[0]
-                            if kpt_num1 == kpt_num2:
-                                for j in head_order.values():
-                                    x1 = result['result'][i]['keypoints'].numpy()[j][0]
-                                    y1 = result['result'][i]['keypoints'].numpy()[j][1]
-                                    x2 = result['result'][i + 1]['keypoints'].numpy()[j][0]
-                                    # y2 = result['result'][i+1]['keypoints'].numpy()[j][1]
-                                    x, y, z = fl.get_distance(self.video_mode, self.camMtx1, x1, y1, x2)
-                                    coordinates_u.append(x)
-                                    coordinates_v.append(y)
-                                    dists.append(z)
-                            if i + 2 >= ppl_num:
-                                break
+                    ppl = result['result']
+                    ppl_num = len(ppl)
+                    coordinates_u, coordinates_v, dists = fl.people_3d_coord(ppl, ppl_num, self.video_mode, self.camMtx1)
 
                     self.final_result.append(result)
                     if opt.save_img or opt.save_video or opt.vis:
