@@ -507,9 +507,12 @@ class DataWriter:
                         'imgname': im_name,
                         'result': result
                     }
+
+                    # 3D coordinates computation
                     ppl = result['result']
                     ppl_num = len(ppl)
-                    coordinates_u, coordinates_v, dists = fl.people_3d_coord(ppl, ppl_num, self.video_mode, self.camMtx1)
+                    coordinates_u, coordinates_v, dists = fl.people_3d_coord(ppl, ppl_num,
+                                                                             self.video_mode, self.camMtx1, orig_img)
 
                     self.final_result.append(result)
                     if opt.save_img or opt.save_video or opt.vis:

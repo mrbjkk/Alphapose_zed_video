@@ -2,6 +2,8 @@ import configparser
 import numpy as np
 import cv2
 import threading
+from dHash import DHash
+from PIL import Image
 
 cf = configparser.ConfigParser()
 cf.read("SN23076.conf")
@@ -74,10 +76,7 @@ def get_distance(video_mode, camMtx1, u1, v1, u2, co_format):
     x = u[0] * z / doffs
     y = v1 * z / doffs
 
-    if co_format is 'uv':
-        return u[0], v1, z
-    if co_format is 'xy':
-        return x, y, z
+    return u[0], v1, x, y, z
 
 
 def get_resolution(opt):
@@ -93,7 +92,7 @@ def set_camera(capture):
     capture.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
 
-def people_3d_coord(ppl, ppl_num, video_mode, camera_matrix):
+def people_3d_coord(ppl, ppl_num, video_mode, camera_matrix, frame):
     coordinates_u = []
     coordinates_v = []
     dists = []
@@ -102,6 +101,8 @@ def people_3d_coord(ppl, ppl_num, video_mode, camera_matrix):
                       'LWrist': 9, 'RWrist': 10,
                       # 'LHip': 11, 'RHip': 12,
                       'LAnkle': 15, 'RAnkle': 16}
+    kpts = {}
+
     if ppl_num is 2:
         for i in range(ppl_num):
             kpt_num1 = ppl[i]['keypoints'].numpy().shape[0]
@@ -112,11 +113,54 @@ def people_3d_coord(ppl, ppl_num, video_mode, camera_matrix):
                     y1 = ppl[i]['keypoints'].numpy()[j][1]
                     x2 = ppl[i + 1]['keypoints'].numpy()[j][0]
                     # y2 = result['result'][i+1]['keypoints'].numpy()[j][1]
-                    u, v, z = get_distance(video_mode, camera_matrix, x1, y1, x2, 'uv')
+                    u, v, x, y, z = get_distance(video_mode, camera_matrix, x1, y1, x2)
                     coordinates_u.append(u)
                     coordinates_v.append(v)
                     dists.append(z)
             if i + 2 >= ppl_num:
                 break
+    elif ppl_num > 2:
+        for i, m in enumerate(ppl):
+            kpts[i] = m['keypoints'].numpy()
+
+        head_icon1 = np.empty((len(keypoint_order.values()), 2), dtype=float)
+        head_icon2 = np.empty((len(keypoint_order.values()), 2), dtype=float)
+        for i in range(ppl_num):
+            for n, m in enumerate(keypoint_order.values()):
+                head_icon1[n] = (kpts.get(i)[m])
+            y_colum1 = head_icon1.min(axis=1)
+            ymin1 = int(y_colum1.min())
+            ymax1 = int(y_colum1.max())
+            x_colum1 = head_icon1.max(axis=1)
+            xmin1 = int(x_colum1.min())
+            xmax1 = int(x_colum1.max())
+            aoi1 = Image.fromarray(frame[ymin1:ymax1, xmin1:xmax1])
+            # aoi1.save("test1/i" + str(i) + ".jpg", "JPEG")
+            hash_aoi1 = DHash.calculate_hash(aoi1)
+            j = i + 1
+            while j < ppl_num:
+                for n, m in enumerate(keypoint_order.values()):
+                    head_icon2[n] = (kpts.get(j)[m])
+                y_colum2 = head_icon2.min(axis=1)
+                ymin2 = int(y_colum2.min())
+                ymax2 = int(y_colum2.max())
+                x_colum2 = head_icon2.max(axis=1)
+                xmin2 = int(x_colum2.min())
+                xmax2 = int(x_colum2.max())
+                aoi2 = Image.fromarray(frame[ymin2:ymax2, xmin2:xmax2])
+                # aoi2.save("test1/j" + str(j) + ".jpg", "JPEG")
+                hash_aoi2 = DHash.calculate_hash(aoi2)
+                hamming_distance = DHash.hamming_distance(hash_aoi1, hash_aoi2)
+                print("[", i, ",", j, "]:", hamming_distance)
+                if hamming_distance < 25 and len(kpts[i]) == len(kpts[j]):
+                    for n in keypoint_order.values():
+                        x1 = kpts.get(i)[n][0]
+                        y1 = kpts.get(i)[n][1]
+                        x2 = kpts.get(j)[n][0]
+                        x, y, z = get_distance(video_mode, camera_matrix, x1, y1, x2)
+                        coordinates_u.append(x)
+                        coordinates_v.append(y)
+                        dists.append(z)
+                j += 1
 
     return coordinates_u, coordinates_v, dists
