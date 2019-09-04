@@ -12,6 +12,7 @@ SPPE/src/__pycache__/
 SPPE/src/models/__pycache__/
 SPPE/src/models/layers/__pycache__/
 SPPE/src/utils/__pycache__/
+yolo/__pycache__/
 __pycache__/
 testdata/AlphaPose_HD720_SN23076_14-24-04.avi
 testdata/AlphaPose_HD720_SN23076_14-14-42.avi
@@ -21,4 +22,4 @@ testdata/HD720_SN23076_14-24-04.avi
 # testdata/origion/AlphaPose_HD720_SN23076_14-14-42.avi
 testdata/alphapose-results.json
 testdata/vlc-record-2019-09-02-15h40m24s-HD720_SN23076_14-24-04.avi-.mp4
-yolo/__pycache__/
+
