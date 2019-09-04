@@ -517,7 +517,7 @@ class DataWriter:
                     self.final_result.append(result)
                     if opt.save_img or opt.save_video or opt.vis:
                         img = vis_frame(orig_img, result)
-                        if ppl_num is 2:
+                        if len(coordinates_v) > 0 and len(coordinates_u) > 0:
                             for i in range(len(coordinates_v)):
                                 cv2.putText(img, 'z:' + str(round((dists[i] / 10), 1)),
                                             (int(coordinates_u[i]), int(coordinates_v[i]) - 15),

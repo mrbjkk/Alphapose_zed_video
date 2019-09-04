@@ -5,6 +5,10 @@ import threading
 from dHash import DHash
 from PIL import Image
 
+# For test running
+import shutil
+import os
+
 cf = configparser.ConfigParser()
 cf.read("SN23076.conf")
 
@@ -63,7 +67,7 @@ def frame_undistort(camMtx1, camMtx2, distCoef1, distCoef2, frame):
     return rec_img
 
 
-def get_distance(video_mode, camMtx1, u1, v1, u2, co_format):
+def get_distance(video_mode, camMtx1, u1, v1, u2):
     fx1 = camMtx1[0][0]
     # fx_r = mtx_r[0][0]
     (w, h) = get_resolution(video_mode)
@@ -102,7 +106,7 @@ def people_3d_coord(ppl, ppl_num, video_mode, camera_matrix, frame):
                       # 'LHip': 11, 'RHip': 12,
                       'LAnkle': 15, 'RAnkle': 16}
     kpts = {}
-
+    w, h = get_resolution("CAM_HD")
     if ppl_num is 2:
         for i in range(ppl_num):
             kpt_num1 = ppl[i]['keypoints'].numpy().shape[0]
@@ -129,38 +133,50 @@ def people_3d_coord(ppl, ppl_num, video_mode, camera_matrix, frame):
             for n, m in enumerate(keypoint_order.values()):
                 head_icon1[n] = (kpts.get(i)[m])
             y_colum1 = head_icon1.min(axis=1)
-            ymin1 = int(y_colum1.min())
-            ymax1 = int(y_colum1.max())
+            y_col1 = sorted([0, h, y_colum1.min(), y_colum1.max()])
+            ymin1 = int(y_col1[1])
+            ymax1 = int(y_col1[2])
             x_colum1 = head_icon1.max(axis=1)
-            xmin1 = int(x_colum1.min())
-            xmax1 = int(x_colum1.max())
+            x_col1 = sorted([0, w, x_colum1.min(), x_colum1.max()])
+            xmin1 = int(x_col1[1])
+            xmax1 = int(x_col1[2])
             aoi1 = Image.fromarray(frame[ymin1:ymax1, xmin1:xmax1])
-            # aoi1.save("test1/i" + str(i) + ".jpg", "JPEG")
+
+            # ------- [FOR TEST] ------
+            #
+            # os.mkdir('test')
+            # aoi1.save("test/i" + str(i) + ".jpg", "JPEG")
+
             hash_aoi1 = DHash.calculate_hash(aoi1)
             j = i + 1
             while j < ppl_num:
                 for n, m in enumerate(keypoint_order.values()):
                     head_icon2[n] = (kpts.get(j)[m])
                 y_colum2 = head_icon2.min(axis=1)
-                ymin2 = int(y_colum2.min())
-                ymax2 = int(y_colum2.max())
+                y_col2 = sorted([0, h, y_colum2.min(), y_colum2.max()])
+                ymin2 = int(y_col2[1])
+                ymax2 = int(y_col2[2])
                 x_colum2 = head_icon2.max(axis=1)
-                xmin2 = int(x_colum2.min())
-                xmax2 = int(x_colum2.max())
+                x_col2 = sorted([0, w, x_colum2.min(), x_colum2.max()])
+                xmin2 = int(x_col2[1])
+                xmax2 = int(x_col2[2])
                 aoi2 = Image.fromarray(frame[ymin2:ymax2, xmin2:xmax2])
-                # aoi2.save("test1/j" + str(j) + ".jpg", "JPEG")
+                # ------- [FOR TEST] ------
+                #
+                # aoi2.save("test/j" + str(j) + ".jpg", "JPEG")
                 hash_aoi2 = DHash.calculate_hash(aoi2)
                 hamming_distance = DHash.hamming_distance(hash_aoi1, hash_aoi2)
-                print("[", i, ",", j, "]:", hamming_distance)
-                if hamming_distance < 25 and len(kpts[i]) == len(kpts[j]):
+                # print("[", i, ",", j, "]:", hamming_distance)
+                if hamming_distance <= 20 and len(kpts[i]) == len(kpts[j]):
                     for n in keypoint_order.values():
                         x1 = kpts.get(i)[n][0]
                         y1 = kpts.get(i)[n][1]
                         x2 = kpts.get(j)[n][0]
-                        x, y, z = get_distance(video_mode, camera_matrix, x1, y1, x2)
-                        coordinates_u.append(x)
-                        coordinates_v.append(y)
+                        u, v, x, y, z = get_distance(video_mode, camera_matrix, x1, y1, x2)
+                        coordinates_u.append(u)
+                        coordinates_v.append(v)
                         dists.append(z)
                 j += 1
+            # shutil.rmtree('test')
 
     return coordinates_u, coordinates_v, dists
