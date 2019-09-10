@@ -1,3 +1,6 @@
+from matplotlib import animation
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import os
 import torch
 from torch.autograd import Variable
@@ -118,7 +121,7 @@ class ImageLoader:
             else:
                 p = mp.Process(target=self.getitem_yolo, args=())
         else:
-            raise NotImplementedError        
+            raise NotImplementedError
         p.daemon = True
         p.start()
         return self
@@ -151,7 +154,7 @@ class ImageLoader:
                 im_name_k = self.imglist[k].rstrip('\n').rstrip('\r')
                 im_name_k = os.path.join(self.img_dir, im_name_k)
                 img_k, orig_img_k, im_dim_list_k = prep_image(im_name_k, inp_dim)
-            
+
                 img.append(img_k)
                 orig_img.append(orig_img_k)
                 im_name.append(im_name_k)
@@ -166,7 +169,7 @@ class ImageLoader:
 
             while self.Q.full():
                 time.sleep(2)
-            
+
             self.Q.put((img, orig_img, im_name, im_dim_list))
 
     def getitem(self):
@@ -186,7 +189,6 @@ class VideoLoader:
         self.stream = cv2.VideoCapture(path)
         assert self.stream.isOpened(), 'Cannot capture source'
         self.stopped = False
-        
 
         self.batchSize = batchSize
         self.datalen = int(self.stream.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -245,7 +247,6 @@ class VideoLoader:
 
                 # process and add the frame to the queue
                 img_k, orig_img_k, im_dim_list_k = prep_frame(frame, inp_dim)
-            
                 img.append(img_k)
                 orig_img.append(orig_img_k)
                 im_name.append(str(k)+'.jpg')
@@ -260,7 +261,7 @@ class VideoLoader:
 
             while self.Q.full():
                 time.sleep(2)
-            
+
             self.Q.put((img, orig_img, im_name, im_dim_list))
 
     def videoinfo(self):
@@ -347,7 +348,6 @@ class DetectionLoader:
                 dets[:, [1, 3]] -= (self.det_inp_dim - scaling_factor * im_dim_list[:, 0].view(-1, 1)) / 2
                 dets[:, [2, 4]] -= (self.det_inp_dim - scaling_factor * im_dim_list[:, 1].view(-1, 1)) / 2
 
-                
                 dets[:, 1:5] /= scaling_factor
                 for j in range(dets.shape[0]):
                     dets[j, [1, 3]] = torch.clamp(dets[j, [1, 3]], 0.0, im_dim_list[j, 0])
@@ -407,7 +407,7 @@ class DetectionProcessor:
     def update(self):
         # keep looping the whole dataset
         for i in range(self.datalen):
-            
+
             with torch.no_grad():
                 (orig_img, im_name, boxes, scores, inps, pt1, pt2) = self.detectionLoader.read()
                 if orig_img is None:
@@ -449,6 +449,9 @@ class DataWriter:
         self.save_video = save_video
         self.stopped = False
         self.final_result = []
+        self.coordinates_u = []
+        self.coordinates_v = []
+        self.dists = []
         # initialize the queue used to store frames read from
         # the video file
         self.Q = Queue(maxsize=queueSize)
@@ -511,16 +514,21 @@ class DataWriter:
                     # 3D coordinates computation
                     ppl = result['result']
                     ppl_num = len(ppl)
-                    coordinates_u, coordinates_v, dists = fl.people_3d_coord(ppl, ppl_num,
+                    self.coordinates_u, self.coordinates_v, self.truex, self.truey, self.dists = fl.people_3d_coord(ppl, ppl_num,
                                                                              self.video_mode, self.camMtx1, orig_img)
+#                     print('u:', self.coordinates_u, 'v: ', self.coordinates_v, 'x: ', self.truex, 'y: ', self.truey, 'z: ', self.dists)
+#                     fig = plt.figure()
+#                     ax = fig.add_subplot(111, projection = '3d')
+#                     ax.scatter(self.truex, self.truey, self.dists)
+#                     plt.show()
 
                     self.final_result.append(result)
                     if opt.save_img or opt.save_video or opt.vis:
                         img = vis_frame(orig_img, result)
-                        if len(coordinates_v) > 0 and len(coordinates_u) > 0:
-                            for i in range(len(coordinates_v)):
-                                cv2.putText(img, 'z:' + str(round((dists[i] / 10), 1)),
-                                            (int(coordinates_u[i]), int(coordinates_v[i]) - 15),
+                        if len(self.coordinates_v) > 0 and len(self.coordinates_u) > 0:
+                            for i in range(len(self.coordinates_v)):
+                                cv2.putText(img, 'z:' + str(round((self.dists[i] / 10), 1)),
+                                            (int(self.coordinates_u[i]), int(self.coordinates_v[i]) - 15),
                                             cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), 3, 8)
                         else:
                             cv2.putText(img, '[N/A]',
@@ -534,6 +542,7 @@ class DataWriter:
                             self.stream.write(img)
             else:
                 time.sleep(0.1)
+
 
     def running(self):
         # indicate that the thread is still running

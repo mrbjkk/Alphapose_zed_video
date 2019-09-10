@@ -9,6 +9,9 @@ from PIL import Image
 import shutil
 import os
 
+import json
+import types
+
 cf = configparser.ConfigParser()
 cf.read("SN23076.conf")
 
@@ -97,6 +100,8 @@ def set_camera(capture):
 
 
 def people_3d_coord(ppl, ppl_num, video_mode, camera_matrix, frame):
+    truex = []
+    truey = []
     coordinates_u = []
     coordinates_v = []
     dists = []
@@ -118,6 +123,12 @@ def people_3d_coord(ppl, ppl_num, video_mode, camera_matrix, frame):
                     x2 = ppl[i + 1]['keypoints'].numpy()[j][0]
                     # y2 = result['result'][i+1]['keypoints'].numpy()[j][1]
                     u, v, x, y, z = get_distance(video_mode, camera_matrix, x1, y1, x2)
+#                     print('u type is :', type(u))
+                    f = open('testdata/kpt.txt', 'a')
+                    f.write(u.astype(str)+','+v.astype(str)+','+x.astype(str)+','+y.astype(str)+','+z.astype(str)+'\n')
+                    f.close()
+                    truex.append(x)
+                    truey.append(y)
                     coordinates_u.append(u)
                     coordinates_v.append(v)
                     dists.append(z)
@@ -173,10 +184,12 @@ def people_3d_coord(ppl, ppl_num, video_mode, camera_matrix, frame):
                         y1 = kpts.get(i)[n][1]
                         x2 = kpts.get(j)[n][0]
                         u, v, x, y, z = get_distance(video_mode, camera_matrix, x1, y1, x2)
+                        truex.append(x)
+                        truey.append(y)
                         coordinates_u.append(u)
                         coordinates_v.append(v)
                         dists.append(z)
                 j += 1
             # shutil.rmtree('test')
 
-    return coordinates_u, coordinates_v, dists
+    return coordinates_u, coordinates_v, truex, truey, dists
