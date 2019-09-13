@@ -25,7 +25,7 @@ from pPose_nms import pose_nms, write_json
 args = opt
 args.dataset = 'coco'
 
-args.video = 'testdata/HD720_30.avi'
+args.video = 'testdata/test_30.avi'
 args.outputpath = 'testdata/'
 args.save_video = True
 args.sp = True

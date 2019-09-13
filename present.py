@@ -21,7 +21,7 @@ rankle = []
 rankle = np.array(rankle)
 Person = []
 Person = np.array(Person)
-f = open('testdata/kpt.txt')
+f = open('testdata/high_accuracy/kpt.txt')
 sourceInLines = f.readlines()
 f.close()
 
@@ -59,15 +59,19 @@ col_idx = np.array([2,3,4])
 for i in range(len(alldata)):
     Person = np.append(Person, alldata[[i], col_idx])
 
+for i in range(len(Person)):
+    if i % 3 == 0:
+        Person[i] = Person[i] / 10
+
+# print(Person)
 for i in range(len(alldata)):
     coor_z[[i], 2] = alldata[[i], 4]
 
 # coor_z = coor_z.reshape(360, 7, 3)
 # print(coor_z)
 Person = Person.reshape(int(len(Person)/21), 7, 3)
-# print(Person)
-# print(type(len(Person)/3))
-
+# # print(type(len(Person)/3))
+# 
 fig = plt.figure()
 ax = Axes3D(fig)
 stick_defines = [
@@ -94,6 +98,6 @@ def animate(j):
 #         stick_line._verts3d = z_lines[j,i,0], z_lines[j,i,2], z_lines[j,i,1]
 #     return z_lines
 
-anim = animation.FuncAnimation(fig, animate, frames = int(len(Person/21)), interval=101, blit=True)
+anim = animation.FuncAnimation(fig, animate, frames = int(len(Person/21)), interval=100, blit=False)
 
 plt.show()

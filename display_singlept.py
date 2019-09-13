@@ -21,7 +21,8 @@ rankle = []
 rankle = np.array(rankle)
 Person = []
 Person = np.array(Person)
-f = open('testdata/kpt.txt')
+
+f = open('testdata/original_video/kpt.txt')
 sourceInLines = f.readlines()
 f.close()
 
@@ -50,14 +51,22 @@ for i in range(len(alldata)):
     if i % 7 == 6:
         rankle = np.append(rankle, alldata[[i], col_idx])
 
-lankle = lankle.reshape((int(len(lankle)/3), 3))
+lwrist = lwrist.reshape((int(len(lwrist)/3), 3))
 
 fig = plt.figure()
-ax = Axes3D(fig)
+# ax = Axes3D(fig)
+count = 0
+for i in range(int(len(lwrist))):
+#     if lwrist[i,2] > 1500.0 and lwrist[i,2] < 2200.0:
+    if lwrist[i,2] < 6000.0 and lwrist[i,2] > 0:
+        plt.bar(i, lwrist[i,2])
+        count = count + 1
 
+print('reasonable rate is: ', count / len(lwrist))
+plt.savefig('testdata/original_video/bar.jpg')
 
-def animate(i):
-    return ax.scatter(lankle[i, 0], lankle[i, 1], lankle[i, 2])
+# def animate(i):
+#     return ax.scatter(lwrist[i, 0], lwrist[i, 1], lwrist[i, 2])
 
-anim = animation.FuncAnimation(fig, animate, frames = len(lankle), interval = 20, blit = False)
+# anim = animation.FuncAnimation(fig, animate, frames = len(lwrist), interval = 20, blit = False)
 plt.show()
