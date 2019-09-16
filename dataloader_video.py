@@ -473,6 +473,7 @@ class DataWriter:
         return self
 
     def update(self):
+        count = 0
         # keep looping infinitely
         while True:
             # if the thread indicator variable is set, stop the
@@ -530,6 +531,7 @@ class DataWriter:
                                 cv2.putText(img, 'z:' + str(round((self.dists[i] / 10), 1)),
                                             (int(self.coordinates_u[i]), int(self.coordinates_v[i]) - 15),
                                             cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), 3, 8)
+                                cv2.putText(img, 'frames: ' + str(count), (620, 620), cv2.FONT_HERSHEY_PLAIN, 2, (0,100,90), 3, 8)
                         else:
                             cv2.putText(img, '[N/A]',
                                         (40, 620), cv2.FONT_HERSHEY_PLAIN, 2, (0, 100, 90), 3, 8)
@@ -542,6 +544,7 @@ class DataWriter:
                             self.stream.write(img)
             else:
                 time.sleep(0.1)
+            count = count + 1
 
 
     def running(self):

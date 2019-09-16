@@ -22,7 +22,7 @@ rankle = np.array(rankle)
 Person = []
 Person = np.array(Person)
 
-f = open('testdata/original_video/kpt.txt')
+f = open('testdata/high_accuracy/kpt.txt')
 sourceInLines = f.readlines()
 f.close()
 
@@ -51,22 +51,44 @@ for i in range(len(alldata)):
     if i % 7 == 6:
         rankle = np.append(rankle, alldata[[i], col_idx])
 
-lwrist = lwrist.reshape((int(len(lwrist)/3), 3))
+lankle = lankle.reshape((int(len(lankle)/3), 3))
+lanklez = []
 
 fig = plt.figure()
 # ax = Axes3D(fig)
 count = 0
-for i in range(int(len(lwrist))):
-#     if lwrist[i,2] > 1500.0 and lwrist[i,2] < 2200.0:
-    if lwrist[i,2] < 6000.0 and lwrist[i,2] > 0:
-        plt.bar(i, lwrist[i,2])
+
+for i in range(int(len(lankle)/3)):
+    if lankle[i,2] < 3500.0 and lankle[i,2] > 0:
+        lanklez = np.append(lanklez, lankle[i,2])
         count = count + 1
 
-print('reasonable rate is: ', count / len(lwrist))
-plt.savefig('testdata/original_video/bar.jpg')
+for i in range(len(lanklez)):
+#     if lwrist[i,2] < 3000.0 and lwrist[i,2] > 0:
+#         lwristz = np.append(lwristz, lwrist[i,2])
+    plt.bar(i, lanklez[i])
+
+# for i in range(len(lankle)):
+#     if lankle[i,2] < 3500.0 and lankle[i,2] > 0:
+#         plt.bar(i, lankle[i,2])
+
+# x = np.arange(0, len(lanklez))
+# f = np.polyfit(x, lanklez, 3)
+# p = np.poly1d(f)
+# print(p)
+
+# plot = plt.plot(x, lanklez)
+
+# # draw expected line
+# plt.plot([25, 148], [1800, 3000], c = 'r')
+# plt.plot([149, 225], [3000, 1800], c = 'r')
+# plt.plot([226,275], [1800, 3000], c = 'r')
+# plt.plot([276, 330], [3000, 1800], c = 'r')
+print('rate is: ', count / int(len(lankle)/3))
+# plt.savefig('testdata/high_accuracy/bar.jpg')
 
 # def animate(i):
-#     return ax.scatter(lwrist[i, 0], lwrist[i, 1], lwrist[i, 2])
-
-# anim = animation.FuncAnimation(fig, animate, frames = len(lwrist), interval = 20, blit = False)
+#     return ax.scatter(lankle[i, 0], lankle[i, 1], lankle[i, 2])
+# 
+# anim = animation.FuncAnimation(fig, animate, frames = len(lankle), interval = 20, blit = False)
 plt.show()
