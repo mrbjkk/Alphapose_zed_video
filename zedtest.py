@@ -1,3 +1,4 @@
+import numpy as np
 import pyzed.sl as sl
 import cv2
 
@@ -34,10 +35,17 @@ def main():
 #             depth_value = depth_map.get_value(100,100)
 #             cv2.imshow("ZED", mat.get_data())
             cvdata = depth_fordisp.get_data()
-            noalpha = cv2.cvtColor(cvdata, cv2.COLOR_RGBA2BGR)
-            for i in noalpha[1]:
-#                 print("i",i)
-                noalpha[i] = [0,0,255]
+            noalpha = cv2.cvtColor(cvdata, cv2.COLOR_RGBA2RGB)
+#             for row in range(len(noalpha)):
+#                 for col in range(len(noalpha[row])):
+#                     for val in range(len(noalpha[row, col])):
+#                         if noalpha[row,col,val] == 0:
+#                             noalpha[row,col] = [0,0,255]
+#                             cv2.imshow("RED", noalpha)
+            noalpha[noalpha[100,100] == [0,0,0]] = np.arange(720)
+#             print(noalpha[:,:,2])
+#             noalpha[noalpha < 144] = 255
+
             cv2.imshow("RED", noalpha)
 #             print(noalpha.shape)
 #             print("cvdata(4):", cvdata, "noalpha(3):", noalpha)
