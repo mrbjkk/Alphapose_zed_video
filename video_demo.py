@@ -26,6 +26,8 @@ args = opt
 args.dataset = 'coco'
 
 args.video = 'testdata/high_accuracy/HD720_30.avi'
+# args.video = 'testdata/NationalDaytest/HD720test.avi'
+# args.outputpath = 'testdata/NationalDaytest/'
 args.outputpath = 'testdata/high_accuracy/'
 args.save_video = True
 args.sp = True

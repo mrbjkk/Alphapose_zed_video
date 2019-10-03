@@ -1,3 +1,4 @@
+import pyzed.sl as sl
 import torch
 import re
 import os
@@ -149,6 +150,13 @@ def vis_frame(frame, im_res, format='coco'):
 
     return rendered image
     '''
+#     filepath = '/home/yurik/Documents/Program/Alphapose_zed_video/testdata/high_accuracy/HD720_30.svo'
+#     init = sl.InitParameters(svo_input_filename=filepath,svo_real_time_mode=False)
+#     cam = sl.Camera()
+#     runtime = sl.RuntimeParameters()
+#     status = cam.open(init)
+#     mat = sl.Mat()
+#     zeroarr = np.zeros((720,1280,3))
     if format == 'coco':
         l_pair = [
             (0, 1), (0, 2), (1, 3), (2, 4),  # Head
@@ -160,9 +168,9 @@ def vis_frame(frame, im_res, format='coco'):
         p_color = [(0, 255, 255), (0, 191, 255),(0, 255, 102),(0, 77, 255), (0, 255, 0), #Nose, LEye, REye, LEar, REar
                     (77,255,255), (77, 255, 204), (77,204,255), (191, 255, 77), (77,191,255), (191, 255, 77), #LShoulder, RShoulder, LElbow, RElbow, LWrist, RWrist
                     (204,77,255), (77,255,204), (191,77,255), (77,255,191), (127,77,255), (77,255,127), (0, 255, 255)] #LHip, RHip, LKnee, Rknee, LAnkle, RAnkle, Neck
-        line_color = [(0, 215, 255), (0, 255, 204), (0, 134, 255), (0, 255, 50), 
-                    (77,255,222), (77,196,255), (77,135,255), (191,255,77), (77,255,77), 
-                    (77,222,255), (255,156,127), 
+        line_color = [(0, 215, 255), (0, 255, 204), (0, 134, 255), (0, 255, 50),
+                    (77,255,222), (77,196,255), (77,135,255), (191,255,77), (77,255,77),
+                    (77,222,255), (255,156,127),
                     (0,127,255), (255,127,77), (0,77,255), (255,77,36)]
     elif format == 'mpii':
         l_pair = [
@@ -179,6 +187,23 @@ def vis_frame(frame, im_res, format='coco'):
     img = frame
     height,width = img.shape[:2]
     img = cv2.resize(img,(int(width/2), int(height/2)))
+#     err = cam.grab(runtime)
+#     if err == sl.ERROR_CODE.SUCCESS:
+#         cam.retrieve_image(mat, sl.VIEW.VIEW_DEPTH)
+#         depthmap = mat.get_data()
+#         if img.shape[2] == 3:
+#             depthmap = cv2.cvtColor(depthmap, cv2.COLOR_RGBA2RGB)
+#         depthmap = cv2.resize(depthmap, (int(img.shape[1]/2), img.shape[0]))
+#         depthmap = np.hstack((depthmap, zeroarr))
+#         depthmap = depthmap.astype(np.uint8)
+#         img = cv2.addWeighted(img, 0, depthmap, 1, 3)
+#     filepath = '/home/yurik/Documents/Program/Alphapose_zed_video/testdata/high_accuracy/HD720_30.svo'
+#     init = sl.InitParameters(svo_input_filename=filepath,svo_real_time_mode=False)
+#     cam = sl.Camera()
+#     runtime = sl.RuntimeParameters()
+#     status = cam.open(init)
+#     mat = sl.Mat()
+#     zeroarr = np.zeros((720,1280,3))
     for human in im_res['result']:
         part_line = {}
         kp_preds = human['keypoints']
@@ -215,6 +240,14 @@ def vis_frame(frame, im_res, format='coco'):
                 #cv2.line(bg, start_xy, end_xy, line_color[i], (2 * (kp_scores[start_p] + kp_scores[end_p])) + 1)
                 transparency = max(0, min(1, 0.5*(kp_scores[start_p] + kp_scores[end_p])))
                 img = cv2.addWeighted(bg, transparency, img, 1-transparency, 0)
+                err = cam.grab(runtime)
+                if err == sl.ERROR_CODE.SUCCESS:
+                    cam.retrieve_image(mat, sl.VIEW.VIEW_DEPTH)
+                    depthmap = mat.get_data()
+                    if img.shape[2] == 3:
+                        depthmap = cv2.cvtColor(depthmap, cv2.COLOR_RGBA2RGB)
+                    depthmap = cv2.resize(depthmap, (int(img.shape[1]), img.shape[0]))
+                    img = cv2.addWeighted(img, 0, depthmap, 1, 3)
     img = cv2.resize(img,(width,height),interpolation=cv2.INTER_CUBIC)
     return img
 
