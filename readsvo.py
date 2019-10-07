@@ -14,6 +14,7 @@ def main():
     print("Reading SVO file: {0}".format(filepath))
 
     init = sl.InitParameters(svo_input_filename=filepath,svo_real_time_mode=False)
+    init.depth_mode = sl.DEPTH_MODE.DEPTH_MODE_QUALITY
     cam = sl.Camera()
     status = cam.open(init)
     if status != sl.ERROR_CODE.SUCCESS:
@@ -31,26 +32,16 @@ def main():
         err = cam.grab(runtime)
         if err == sl.ERROR_CODE.SUCCESS:
             cam.retrieve_image(mat, sl.VIEW.VIEW_DEPTH)
-            display = mat.get_data()
-            print(display.shape[2])
-            display = cv2.cvtColor(display, cv2.COLOR_RGBA2RGB)
-#             print(display.shape)
-#             lena = cv2.resize(lena, (display.shape[1], display.shape[0]))
-#             lena = display.copy()
-#             cv2.line(lena,(10,10),(200,200),(0,255,0),3)
-#             cv2.addWeighted(display, 0.5, lena, 1.5, 3, display)
-            cv2.imshow("ZED", display)
-#             cv2.imshow("Lena", lena)
+            depthmap = mat.get_data()
+            depthmap = cv2.cvtColor(depthmap, cv2.COLOR_RGBA2RGB)
+            depthmap = cv2.applyColorMap(depthmap, cv2.COLORMAP_JET)
+#             print(depthmap[100,100,2])
+#             depthmap[depthmap < 255] == 255
+            cv2.imshow("ZED", depthmap)
             key = cv2.waitKey(1)
-#             saving_image(key, mat)
         else:
             key = cv2.waitKey(1)
     cv2.destroyAllWindows()
-
-#     print_camera_information(cam)
-#     saving_depth(cam)
-#     saving_point_cloud(cam)
-
     cam.close()
     print("\nFINISH")
 
