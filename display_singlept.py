@@ -22,7 +22,7 @@ rankle = np.array(rankle)
 Person = []
 Person = np.array(Person)
 
-f = open('testdata/high_accuracy/kpt.txt')
+f = open('testdata/20191014/diagonal2/kpt.txt')
 sourceInLines = f.readlines()
 f.close()
 
@@ -59,7 +59,7 @@ fig = plt.figure()
 count = 0
 
 for i in range(int(len(lankle)/3)):
-    if lankle[i,2] < 3500.0 and lankle[i,2] > 0:
+    if lankle[i,2] < 100000.0 and lankle[i,2] > 0:
         lanklez = np.append(lanklez, lankle[i,2])
         count = count + 1
 
@@ -72,12 +72,12 @@ for i in range(len(lanklez)):
 #     if lankle[i,2] < 3500.0 and lankle[i,2] > 0:
 #         plt.bar(i, lankle[i,2])
 
-# x = np.arange(0, len(lanklez))
-# f = np.polyfit(x, lanklez, 3)
-# p = np.poly1d(f)
-# print(p)
+x = np.arange(0, len(lanklez))
+f = np.polyfit(x, lanklez, 3)
+p = np.poly1d(f)
+print(p)
 
-# plot = plt.plot(x, lanklez)
+plot = plt.plot(x, lanklez)
 
 # # draw expected line
 # plt.plot([25, 148], [1800, 3000], c = 'r')
@@ -85,7 +85,7 @@ for i in range(len(lanklez)):
 # plt.plot([226,275], [1800, 3000], c = 'r')
 # plt.plot([276, 330], [3000, 1800], c = 'r')
 print('rate is: ', count / int(len(lankle)/3))
-# plt.savefig('testdata/high_accuracy/bar.jpg')
+plt.savefig('testdata/20191014/diagonal2/bar.jpg')
 
 # def animate(i):
 #     return ax.scatter(lankle[i, 0], lankle[i, 1], lankle[i, 2])

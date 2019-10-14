@@ -475,13 +475,14 @@ class DataWriter:
 
     def update(self):
         count = 0
-        filepath = '/home/yurik/Documents/Program/Alphapose_zed_video/testdata/high_accuracy/HD720_30.svo'
-        init = sl.InitParameters(svo_input_filename=filepath,svo_real_time_mode=False)
-        cam = sl.Camera()
-        runtime = sl.RuntimeParameters()
-        status = cam.open(init)
-        mat = sl.Mat()
-        zeroarr = np.zeros((720,1280,3))
+#         filepath = '/home/yurik/Documents/Program/Alphapose_zed_video/testdata/20191014/walkstraightly/walkstraightly.svo'
+#         init = sl.InitParameters(svo_input_filename=filepath,svo_real_time_mode=False)
+#         init.depth_mode = sl.DEPTH_MODE.DEPTH_MODE_QUALITY
+#         cam = sl.Camera()
+#         runtime = sl.RuntimeParameters()
+#         status = cam.open(init)
+#         mat = sl.Mat()
+#         zeroarr = np.zeros((720,1280,3))
         # keep looping infinitely
         while True:
             # if the thread indicator variable is set, stop the
@@ -529,17 +530,17 @@ class DataWriter:
                     self.final_result.append(result)
                     if opt.save_img or opt.save_video or opt.vis:
                         img = vis_frame(orig_img, result)
-                        err = cam.grab(runtime)
-                        if err == sl.ERROR_CODE.SUCCESS:
-                            cam.retrieve_image(mat, sl.VIEW.VIEW_DEPTH)
-                            depthmap = mat.get_data()
-                            if img.shape[2] == 3:
-                                depthmap = cv2.cvtColor(depthmap, cv2.COLOR_RGBA2RGB)
-                            depthmap = cv2.resize(depthmap, (int(img.shape[1]/2), img.shape[0]))
-                            depthmap = cv2.applyColorMap(depthmap, cv2.COLORMAP_JET)
-                            depthmap = np.hstack((depthmap, zeroarr))
-                            depthmap = depthmap.astype(np.uint8)
-                            img = cv2.addWeighted(img, 0.5, depthmap, 0.5, 3)
+#                         err = cam.grab(runtime)
+#                         if err == sl.ERROR_CODE.SUCCESS:
+#                             cam.retrieve_image(mat, sl.VIEW.VIEW_DEPTH)
+#                             depthmap = mat.get_data()
+#                             if img.shape[2] == 3:
+#                                 depthmap = cv2.cvtColor(depthmap, cv2.COLOR_RGBA2RGB)
+#                             depthmap = cv2.resize(depthmap, (int(img.shape[1]/2), img.shape[0]))
+#                             depthmap = cv2.applyColorMap(depthmap, cv2.COLORMAP_JET)
+#                             depthmap = np.hstack((depthmap, zeroarr))
+#                             depthmap = depthmap.astype(np.uint8)
+#                             img = cv2.addWeighted(img, 0.5, depthmap, 0.5, 3)
                         if len(self.coordinates_v) > 0 and len(self.coordinates_u) > 0:
                             for i in range(len(self.coordinates_v)):
                                 cv2.putText(img, 'z:' + str(round((self.dists[i] / 10), 1)),

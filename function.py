@@ -124,7 +124,7 @@ def people_3d_coord(ppl, ppl_num, video_mode, camera_matrix, frame):
                     # y2 = result['result'][i+1]['keypoints'].numpy()[j][1]
                     u, v, x, y, z = get_distance(video_mode, camera_matrix, x1, y1, x2)
 #                     print('u type is :', type(u))
-                    f = open('testdata/high_accuracy/kpt.txt', 'a')
+                    f = open('testdata/20191014/diagonal2/kpt.txt', 'a')
                     f.write(u.astype(str)+','+v.astype(str)+','+x.astype(str)+','+y.astype(str)+','+z.astype(str)+'\n')
                     f.close()
                     truex.append(x)

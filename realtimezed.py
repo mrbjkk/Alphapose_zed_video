@@ -9,6 +9,7 @@ step_camera_settings = 1
 def main():
     print("Running...")
     init = sl.InitParameters()
+    init.depth_mode = sl.DEPTH_MODE.DEPTH_MODE_ULTRA
     cam = sl.Camera()
     if not cam.is_opened():
         print("Opening ZED Camera...")
@@ -18,7 +19,7 @@ def main():
         exit()
 
     runtime = sl.RuntimeParameters()
-    mat = sl.Mat()
+    img = sl.Mat()
     depth_map = sl.Mat()
     depth_fordisp = sl.Mat()
     disparity_map = sl.Mat()
@@ -27,9 +28,14 @@ def main():
     while key != 113:  # for 'q' key
         err = cam.grab(runtime)
         if err == sl.ERROR_CODE.SUCCESS:
-            cam.retrieve_image(mat, sl.VIEW.VIEW_LEFT)
-            matshow = mat.get_data()
-            cv2.imshow("test", matshow)
+            cam.retrieve_image(img, sl.VIEW.VIEW_LEFT)
+            cam.retrieve_image(depth_map, sl.VIEW.VIEW_DEPTH)
+            imgshow = img.get_data()
+            depthshow = depth_map.get_data()
+            depthshow = cv2.cvtColor(depthshow, cv2.COLOR_RGBA2RGB)
+            depthshow = cv2.applyColorMap(depthshow, cv2.COLORMAP_JET)
+            cv2.imshow("img", imgshow)
+            cv2.imshow("depth", depthshow)
             key = cv2.waitKey(5)
         else:
             key = cv2.waitKey(5)
