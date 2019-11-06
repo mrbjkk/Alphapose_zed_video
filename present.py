@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pdb
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
@@ -40,22 +41,29 @@ coor_z = np.zeros((len(alldata), 3))
 # print(np.shape(alldata))
 # print(len(alldata))
 col_idx = np.array([2,3,4])
-# for i in range(len(alldata)):
-#     if i % 7 == 0:
-#         nose = np.append(nose, alldata[[i], col_idx])
-#     if i % 7 == 1:
-#         lshoulder = np.append(lshoulder, alldata[[i], col_idx])
-#     if i % 7 == 2:
-#         rshoulder = np.append(rshoulder, alldata[[i], col_idx])
-#     if i % 7 == 3:
-#         lwrist = np.append(lwrist, alldata[[i], col_idx])
-#     if i % 7 == 4:
-#         rwrist = np.append(rwrist, alldata[[i], col_idx])
-#     if i % 7 == 5:
-#         lankle = np.append(lankle, alldata[[i], col_idx])
-#     if i % 7 == 6:
-#         rankle = np.append(rankle, alldata[[i], col_idx])
+for i in range(len(alldata)):
+    if i % 7 == 0:
+        nose = np.append(nose, alldata[[i], col_idx])
+    if i % 7 == 1:
+        lshoulder = np.append(lshoulder, alldata[[i], col_idx])
+    if i % 7 == 2:
+        rshoulder = np.append(rshoulder, alldata[[i], col_idx])
+    if i % 7 == 3:
+        lwrist = np.append(lwrist, alldata[[i], col_idx])
+    if i % 7 == 4:
+        rwrist = np.append(rwrist, alldata[[i], col_idx])
+    if i % 7 == 5:
+        lankle = np.append(lankle, alldata[[i], col_idx])
+    if i % 7 == 6:
+        rankle = np.append(rankle, alldata[[i], col_idx])
 
+fig = plt.figure()
+ax = Axes3D(fig)
+# for i in range(0, len(lwrist), 3):
+#     ax.scatter(lwrist[i], lwrist[i+1], lwrist[i+2])
+# 
+# plt.show()
+pdb.set_trace()
 for i in range(len(alldata)):
     Person = np.append(Person, alldata[[i], col_idx])
 
@@ -72,8 +80,6 @@ for i in range(len(alldata)):
 Person = Person.reshape(int(len(Person)/21), 7, 3)
 # # print(type(len(Person)/3))
 # 
-fig = plt.figure()
-ax = Axes3D(fig)
 stick_defines = [
     (0, 1),
     (0, 2),

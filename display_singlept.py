@@ -22,7 +22,7 @@ rankle = np.array(rankle)
 Person = []
 Person = np.array(Person)
 
-f = open('testdata/20191014/diagonal2/kpt.txt')
+f = open('testdata/high_accuracy/kpt.txt')
 sourceInLines = f.readlines()
 f.close()
 
@@ -54,8 +54,9 @@ for i in range(len(alldata)):
 lankle = lankle.reshape((int(len(lankle)/3), 3))
 lanklez = []
 
-fig = plt.figure()
-# ax = Axes3D(fig)
+# fig1 = plt.figure()
+fig2 = plt.figure()
+ax = Axes3D(fig2)
 count = 0
 
 for i in range(int(len(lankle)/3)):
@@ -85,10 +86,10 @@ plot = plt.plot(x, lanklez)
 # plt.plot([226,275], [1800, 3000], c = 'r')
 # plt.plot([276, 330], [3000, 1800], c = 'r')
 print('rate is: ', count / int(len(lankle)/3))
-plt.savefig('testdata/20191014/diagonal2/bar.jpg')
+plt.savefig('testdata/high_accuracy/bar.jpg')
 
-# def animate(i):
-#     return ax.scatter(lankle[i, 0], lankle[i, 1], lankle[i, 2])
-# 
-# anim = animation.FuncAnimation(fig, animate, frames = len(lankle), interval = 20, blit = False)
+def animate(i):
+    return ax.scatter(lankle[i, 0], lankle[i, 1], lankle[i, 2])
+
+anim = animation.FuncAnimation(fig2, animate, frames = len(lankle), interval = 20, blit = False)
 plt.show()
