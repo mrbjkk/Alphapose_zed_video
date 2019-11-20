@@ -70,7 +70,7 @@ def frame_undistort(camMtx1, camMtx2, distCoef1, distCoef2, frame):
     return rec_img
 
 
-def get_distance(video_mode, camMtx1, u1, v1, u2, v2):
+def get_distance(video_mode, camMtx1, u1, v1, u2):
 #     print("u1:", u1, "v1:", v1, "u2:", u2)
 #     print(camMtx1)
     fx1 = camMtx1[0][0]
@@ -84,12 +84,10 @@ def get_distance(video_mode, camMtx1, u1, v1, u2, v2):
     z = fx1 * baseline / doffs
 #     x = u[0] * z / doffs
 #     y = v1 * z / doffs
-#     x = z * (u[0] - camMtx1[0][2]) / fx1
-#     y = z * (v1 - camMtx1[1][2]) / fx1
+    x = z * (u[0] - camMtx1[0][2]) / fx1
+    y = z * (v1 - camMtx1[1][2]) / fx1
 #     x = baseline * u[0] / doffs
 #     y = baseline * v1 / doffs
-    x = z * u[0] / fx1
-    y = z * v1 / fx1
 
     return u[0], v1, x, y, z
 
@@ -129,10 +127,12 @@ def people_3d_coord(ppl, ppl_num, video_mode, camera_matrix, frame):
                     x1 = ppl[i]['keypoints'].numpy()[j][0]
                     y1 = ppl[i]['keypoints'].numpy()[j][1]
                     x2 = ppl[i + 1]['keypoints'].numpy()[j][0]
-                    y2 = result['result'][i+1]['keypoints'].numpy()[j][1]
-                    u, v, x, y, z = get_distance(video_mode, camera_matrix, x1, y1, x2, y2)
+#                     y2 = result['result'][i+1]['keypoints'].numpy()[j][1]
+                    u, v, x, y, z = get_distance(video_mode, camera_matrix, x1, y1, x2)
 #                     print('u type is :', type(u))
-                    f = open('testdata/high_accuracy/kpt.txt', 'a')
+#                     f = open('testdata/high_accuracy/kpt.txt', 'a')
+#                     f = open('testdata/xyverif/lkpt.txt', 'a')
+                    f = open('testdata/xyverif/rkpt.txt', 'a')
                     f.write(u.astype(str)+','+v.astype(str)+','+x.astype(str)+','+y.astype(str)+','+z.astype(str)+'\n')
 #                     f.write(u.astype(str)+','+v.astype(str)+','+z.astype(str)+'\n')
                     f.close()

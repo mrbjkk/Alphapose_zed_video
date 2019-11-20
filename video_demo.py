@@ -25,10 +25,14 @@ from pPose_nms import pose_nms, write_json
 args = opt
 args.dataset = 'coco'
 
-args.video = 'testdata/high_accuracy/HD720_30.avi'
+# args.video = 'testdata/xyvali/rightcenter.avi'
+# args.video = 'testdata/xyverif/leftcut.avi'
+args.video = 'testdata/xyverif/rightcut.avi'
+# args.video = 'testdata/high_accuracy/HD720_30.avi'
 # args.video = 'testdata/NationalDaytest/HD720test.avi'
 # args.outputpath = 'testdata/NationalDaytest/'
-args.outputpath = 'testdata/high_accuracy/'
+# args.outputpath = 'testdata/high_accuracy/'
+args.outputpath = 'testdata/xyverif/'
 args.save_video = True
 args.sp = True
 args.vis_fast = True

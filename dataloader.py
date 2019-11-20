@@ -116,7 +116,7 @@ class ImageLoader:
             else:
                 p = mp.Process(target=self.getitem_yolo, args=())
         else:
-            raise NotImplementedError        
+            raise NotImplementedError
         p.daemon = True
         p.start()
         return self
@@ -149,7 +149,7 @@ class ImageLoader:
                 im_name_k = self.imglist[k].rstrip('\n').rstrip('\r')
                 im_name_k = os.path.join(self.img_dir, im_name_k)
                 img_k, orig_img_k, im_dim_list_k = prep_image(im_name_k, inp_dim)
-            
+
                 img.append(img_k)
                 orig_img.append(orig_img_k)
                 im_name.append(im_name_k)
@@ -164,7 +164,7 @@ class ImageLoader:
 
             while self.Q.full():
                 time.sleep(2)
-            
+
             self.Q.put((img, orig_img, im_name, im_dim_list))
 
     def getitem(self):
@@ -184,7 +184,7 @@ class VideoLoader:
         self.stream = cv2.VideoCapture(path)
         assert self.stream.isOpened(), 'Cannot capture source'
         self.stopped = False
-        
+
 
         self.batchSize = batchSize
         self.datalen = int(self.stream.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -236,7 +236,7 @@ class VideoLoader:
                     return
                 # process and add the frame to the queue
                 img_k, orig_img_k, im_dim_list_k = prep_frame(frame, inp_dim)
-            
+
                 img.append(img_k)
                 orig_img.append(orig_img_k)
                 im_name.append(str(k)+'.jpg')
@@ -251,7 +251,7 @@ class VideoLoader:
 
             while self.Q.full():
                 time.sleep(2)
-            
+
             self.Q.put((img, orig_img, im_name, im_dim_list))
 
     def videoinfo(self):
@@ -338,7 +338,7 @@ class DetectionLoader:
                 dets[:, [1, 3]] -= (self.det_inp_dim - scaling_factor * im_dim_list[:, 0].view(-1, 1)) / 2
                 dets[:, [2, 4]] -= (self.det_inp_dim - scaling_factor * im_dim_list[:, 1].view(-1, 1)) / 2
 
-                
+
                 dets[:, 1:5] /= scaling_factor
                 for j in range(dets.shape[0]):
                     dets[j, [1, 3]] = torch.clamp(dets[j, [1, 3]], 0.0, im_dim_list[j, 0])
@@ -398,7 +398,7 @@ class DetectionProcessor:
     def update(self):
         # keep looping the whole dataset
         for i in range(self.datalen):
-            
+
             with torch.no_grad():
                 (orig_img, im_name, boxes, scores, inps, pt1, pt2) = self.detectionLoader.read()
                 if orig_img is None:

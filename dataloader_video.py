@@ -543,9 +543,18 @@ class DataWriter:
 #                             img = cv2.addWeighted(img, 0.5, depthmap, 0.5, 3)
                         if len(self.coordinates_v) > 0 and len(self.coordinates_u) > 0:
                             for i in range(len(self.coordinates_v)):
-                                cv2.putText(img, 'z:' + str(round((self.dists[i] / 10), 1)),
+#                                 cv2.putText(img, 'z:' + str(round((self.dists[i] / 10), 1)),
+#                                             (int(self.coordinates_u[i]), int(self.coordinates_v[i]) - 15),
+#                                             cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), 3, 8)
+                                cv2.putText(img, str(round((self.truex[i] / 10), 1)),
                                             (int(self.coordinates_u[i]), int(self.coordinates_v[i]) - 15),
                                             cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), 3, 8)
+                                cv2.putText(img, str(round((self.truey[i] / 10), 1)),
+                                            (int(self.coordinates_u[i]) + 200, int(self.coordinates_v[i]) - 15),
+                                            cv2.FONT_HERSHEY_PLAIN, 2, (255, 0, 0), 3, 8)
+                                cv2.putText(img, str(round((self.dists[i] / 10), 1)),
+                                            (int(self.coordinates_u[i]) + 400, int(self.coordinates_v[i]) - 15),
+                                            cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 3, 8)
                                 cv2.putText(img, 'frames: ' + str(count), (620, 620), cv2.FONT_HERSHEY_PLAIN, 2, (0,100,90), 3, 8)
                         else:
                             cv2.putText(img, '[N/A]',
