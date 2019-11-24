@@ -9,7 +9,6 @@ from matplotlib import animation
 readpath = 'testdata/xyverif/rkpt.txt'
 alldata, lankle = rpt.readkpt(readpath)
 lankle = lankle.reshape((int(len(lankle)/3), 3))
-pdb.set_trace()
 lanklez = []
 lanklex = []
 lankley = []

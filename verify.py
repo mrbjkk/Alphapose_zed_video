@@ -1,6 +1,6 @@
 # verification
 import readkpt as rpt
-import pdb
+import ipdb
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -21,6 +21,7 @@ fig1 = plt.figure()
 # fig2 = plt.figure()
 # ax = Axes3D(fig2)
 
+# fill the lanklex,y,z
 for i in range(int(len(lankle))):
     if lankle[i,0] < 1000.0 and lankle[i,0] > -1000.0:
         lanklex = np.append(lanklex, lankle[i,0])
@@ -31,6 +32,7 @@ for i in range(int(len(lankle))):
 
 for i in range(len(lanklex)):
     plt.bar(i, lanklex[i])
+ipdb.set_trace()
 
 x = np.arange(0, len(lanklex))
 y = np.arange(0, len(lankley))
@@ -52,7 +54,7 @@ for i in range(0, len(lanklex[:35]), interval):
         _xsum.append((j-truexvalue)**2)
     xrmselist.append(np.sqrt(np.sum(_xsum[i:i+interval])/interval))
 meanxrmse = np.mean(xrmselist)
-pdb.set_trace()
+ipdb.set_trace()
 
 # plt.savefig(savepath)
 
