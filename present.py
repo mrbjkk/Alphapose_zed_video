@@ -1,39 +1,45 @@
 import readkpt as rpt
 import numpy as np
 import pandas as pd
-import pdb
+import ipdb
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
 
-readpath = 'testdata/xyverif/rkpt.txt'
+# readpath = 'testdata/xyverif/rkpt.txt'
+# readpath = './rkpt.txt'
+readpath = './testdata/running/kpt8.txt'
 alldata, lankle = rpt.readkpt(readpath)
 lankle = lankle.reshape((int(len(lankle)/3), 3))
 lanklez = []
 lanklex = []
 lankley = []
 for i in range(int(len(lankle))):
-    if lankle[i,0] < 1000.0 and lankle[i,0] > -1000.0:
+#     if lankle[i,0] < 1000.0 and lankle[i,0] > -1000.0:
         lanklex = np.append(lanklex, lankle[i,0])
-    if lankle[i,1] < 1000.0 and lankle[i,1] > 0:
+#     if lankle[i,1] < 1000.0 and lankle[i,1] > 0:
         lankley = np.append(lankley, lankle[i,1])
-    if lankle[i,2] < 4000.0 and lankle[i,2] > 0:
+#     if lankle[i,2] < 4000.0 and lankle[i,2] > 0:
         lanklez = np.append(lanklez, lankle[i,2])
 
+ipdb.set_trace()
 fig = plt.figure()
 ax = Axes3D(fig)
 '''
 trajectory of lankle
 '''
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_zlabel("z")
 # ax.set_xlim([0, 4000])
-# ax.set_ylim([0, 4000])
-# ax.set_zlim([2000, 4000])
+ax.set_ylim([0, 4000])
+ax.set_zlim([0, 8000])
 
 def update(i):
     return ax.scatter(lanklex[i], lankley[i], lanklez[i])
 ani = animation.FuncAnimation(fig, func = update,frames = 100, interval=100, blit = False)
 plt.show()
-pdb.set_trace()
+ipdb.set_trace()
 # for i in range(len(alldata)):
 #     Person = np.append(Person, alldata[[i], col_idx])
 # 

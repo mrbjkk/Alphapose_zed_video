@@ -114,7 +114,8 @@ def people_3d_coord(ppl, ppl_num, video_mode, camera_matrix, frame):
     keypoint_order = {'Nose': 0,
                       'LShoulder': 5, 'RShoulder': 6,
                       'LWrist': 9, 'RWrist': 10,
-                      # 'LHip': 11, 'RHip': 12,
+                      'LHip': 11, 'RHip': 12,
+                      'LKnee': 13, 'RKnee': 14,
                       'LAnkle': 15, 'RAnkle': 16}
     kpts = {}
     w, h = get_resolution("CAM_HD")
@@ -132,7 +133,9 @@ def people_3d_coord(ppl, ppl_num, video_mode, camera_matrix, frame):
 #                     print('u type is :', type(u))
 #                     f = open('testdata/high_accuracy/kpt.txt', 'a')
 #                     f = open('testdata/xyverif/lkpt.txt', 'a')
-                    f = open('testdata/xyverif/rkpt.txt', 'a')
+#                     f = open('testdata/xyverif/rkpt.txt', 'a')
+#                     f = open('testdata/20191014/walkstraightly/kpt.txt', 'a')
+                    f = open('testdata/running/kpt8.txt', 'a')
                     f.write(u.astype(str)+','+v.astype(str)+','+x.astype(str)+','+y.astype(str)+','+z.astype(str)+'\n')
 #                     f.write(u.astype(str)+','+v.astype(str)+','+z.astype(str)+'\n')
                     f.close()

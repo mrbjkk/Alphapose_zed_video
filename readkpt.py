@@ -1,8 +1,8 @@
-import pdb
+import ipdb
 import numpy as np
 import pandas as pd
 
-def readkpt(FilePath):
+def readkpt(FilePath, jointnum):
     alldata = []
     nose = []
     nose = np.array(nose)
@@ -14,6 +14,14 @@ def readkpt(FilePath):
     lwrist = np.array(lwrist)
     rwrist = []
     rwrist = np.array(rwrist)
+    lhip = []
+    lhip = np.array(lhip)
+    rhip = []
+    rhip = np.array(rhip)
+    lknee = []
+    lknee = np.array(lknee)
+    rknee = []
+    rknee = np.array(rknee)
     lankle = []
     lankle = np.array(lankle)
     rankle = []
@@ -34,19 +42,27 @@ def readkpt(FilePath):
 
     col_idx = np.array([2,3,4])
     for i in range(len(alldata)):
-        if i % 7 == 0:
+        if i % jointnum == 0:
             nose = np.append(nose, alldata[[i], col_idx])
-        if i % 7 == 1:
+        if i % jointnum == 1:
             lshoulder = np.append(lshoulder, alldata[[i], col_idx])
-        if i % 7 == 2:
+        if i % jointnum == 2:
             rshoulder = np.append(rshoulder, alldata[[i], col_idx])
-        if i % 7 == 3:
+        if i % jointnum == 3:
             lwrist = np.append(lwrist, alldata[[i], col_idx])
-        if i % 7 == 4:
+        if i % jointnum == 4:
             rwrist = np.append(rwrist, alldata[[i], col_idx])
-        if i % 7 == 5:
+        if i % jointnum == 5:
+            lhip = np.append(lhip, alldata[[i], col_idx])
+        if i % jointnum == 6:
+            rhip = np.append(rhip, alldata[[i], col_idx])
+        if i % jointnum == 7:
+            lknee = np.append(lknee, alldata[[i], col_idx])
+        if i % jointnum == 8:
+            rknee = np.append(rknee, alldata[[i], col_idx])
+        if i % jointnum == 9:
             lankle = np.append(lankle, alldata[[i], col_idx])
-        if i % 7 == 6:
+        if i % jointnum == 10:
             rankle = np.append(rankle, alldata[[i], col_idx])
 
-    return alldata, lankle
+    return alldata, lknee, lankle
